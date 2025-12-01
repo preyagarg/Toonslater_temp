@@ -3,7 +3,6 @@ import pytesseract
 import requests
 import numpy as np
 
-# Path to your Tesseract executable
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 def translate_text(text, target_lang='en'):
@@ -41,14 +40,12 @@ def process_image(image_path, output_path):
         translated = translate_text(text)
         print("Translated:\n", translated)
 
-        # Optional: draw a black rectangle at the bottom for subtitle background
         cv2.rectangle(image, (0, h - 50), (w, h), (0, 0, 0), -1)
 
-        # Put translated subtitle
         cv2.putText(
             image,
             translated,
-            (10, h - 15),  # 10px from left, 15px from bottom
+            (10, h - 15),
             cv2.FONT_HERSHEY_SIMPLEX,
             1,
             (0, 255, 0),
@@ -58,12 +55,10 @@ def process_image(image_path, output_path):
     else:
         print("No Japanese text detected.")
 
-    # Save the output
     cv2.imwrite(output_path, image)
-    print(f"\n✅ Saved translated image to: {output_path}")
+    print(f"\nSaved translated image to: {output_path}")
 
-# ==== RUN THE FUNCTION ====
-input_image = 'japanese_text_image.png'        # Replace with your image path
+input_image = 'japanese_text_image.png'
 output_image = 'translated_output_image.png'
 
 process_image(input_image, output_image)
