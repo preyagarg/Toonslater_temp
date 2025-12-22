@@ -1,8 +1,11 @@
+import os
+from dotenv import load_dotenv
+load_dotenv()
 import cv2
 import pytesseract
 import requests
 
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+pytesseract.pytesseract.tesseract_cmd = os.getenv("TESSERACT_PATH")
 
 # Translate Japanese to English
 def translate_text(text, target_lang='en'):
@@ -43,19 +46,30 @@ def process_image(image_path, output_path):
         font = cv2.FONT_HERSHEY_SIMPLEX
         font_scale = 1
         color = (0, 255, 0)  # Green
-        thickness = 2
+        thickness = 1
 
         (h, w) = image.shape[:2]
         y_pos = h - 20
 
         cv2.rectangle(image, (0, y_pos - 30), (w, h), (0, 0, 0), -1)
+        lines = translated.split('\n')
 
-        cv2.putText(image, translated, (10, y_pos), font, font_scale, color, thickness, cv2.LINE_AA)
+        line_height = 40
+        padding = 20
+        (h, w) = image.shape[:2]
+        extra_height = ((len(lines)-1) * line_height) + padding
+        new_image = cv2.copyMakeBorder(image,0,extra_height,0,0,cv2.BORDER_CONSTANT,value=(0, 0, 0))
+        start_y = h
 
+
+        for i, line in enumerate(lines):
+            y = start_y + (i * line_height)
+
+            cv2.putText(new_image,line,(10, y),font,font_scale,color,thickness,cv2.LINE_AA)
     else:
         print("No Japanese text found.")
 
-    cv2.imwrite(output_path, image)
+    cv2.imwrite(output_path, new_image)
     print(f"\nImage saved to: {output_path}")
 
 input_image = 'japanese_text_image.png'
